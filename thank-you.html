@@ -13,6 +13,23 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <script>
+    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+    n.push=n;n.loaded=!0;n.version="2.0";n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window, document,"script",
+    "https://connect.facebook.net/en_US/fbevents.js");
+    fbq("init", "1471930020871566");
+    fbq("track", "PageView");
+    window.pixlupMetaTrack = function(method, eventName, params) {
+      if (typeof window.fbq !== "function") return;
+      try {
+        window.fbq(method, eventName, params || {});
+      } catch (error) {
+        console.warn("Meta Pixel tracking error:", error);
+      }
+    };
+  </script>
+  <script>
     tailwind = {
       config: {
         theme: {
@@ -74,6 +91,9 @@
   </style>
 </head>
 <body>
+  <noscript>
+    <img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1471930020871566&ev=PageView&noscript=1" alt="" />
+  </noscript>
   <main class="min-h-screen px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
     <section class="mx-auto flex min-h-[calc(100vh-4rem)] max-w-5xl items-center justify-center">
       <div class="glass-card w-full rounded-[36px] p-4 sm:p-5 lg:p-6">
@@ -131,5 +151,19 @@
       </div>
     </section>
   </main>
+  <script>
+    (() => {
+      if (!window.pixlupMetaTrack) return;
+      window.pixlupMetaTrack("trackCustom", "ThankYouPageVisit", {
+        page: "thank-you.html",
+        funnel: "ai_website_workshop"
+      });
+      window.pixlupMetaTrack("track", "Lead", {
+        content_name: "PixlUp AI Website Workshop",
+        value: 149,
+        currency: "INR"
+      });
+    })();
+  </script>
 </body>
 </html>

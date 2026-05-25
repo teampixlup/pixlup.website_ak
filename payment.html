@@ -13,6 +13,23 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <script>
+    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+    n.push=n;n.loaded=!0;n.version="2.0";n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window, document,"script",
+    "https://connect.facebook.net/en_US/fbevents.js");
+    fbq("init", "1471930020871566");
+    fbq("track", "PageView");
+    window.pixlupMetaTrack = function(method, eventName, params) {
+      if (typeof window.fbq !== "function") return;
+      try {
+        window.fbq(method, eventName, params || {});
+      } catch (error) {
+        console.warn("Meta Pixel tracking error:", error);
+      }
+    };
+  </script>
+  <script>
     tailwind = {
       config: {
         theme: {
@@ -211,6 +228,9 @@
   </style>
 </head>
 <body>
+  <noscript>
+    <img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1471930020871566&ev=PageView&noscript=1" alt="" />
+  </noscript>
   <div class="noise"></div>
 
   <header class="px-4 pt-5 sm:px-6 lg:px-8">
@@ -397,6 +417,15 @@
 
       if (!form || !fileInput || !dropzone || !submitButton || !statusBox || !progressShell || !progressBar || !progressValue || !progressLabel || !summary || !copyUpiButton || !upiId) {
         return;
+      }
+
+      if (window.pixlupMetaTrack) {
+        window.pixlupMetaTrack("trackCustom", "PaymentPageVisit", {
+          page: "payment.html",
+          funnel: "ai_website_workshop",
+          value: 149,
+          currency: "INR"
+        });
       }
 
       if (window.emailjs) {
@@ -1127,6 +1156,13 @@
           }
 
           stopFakeProgress(true);
+          if (window.pixlupMetaTrack) {
+            window.pixlupMetaTrack("trackCustom", "PaymentProofUploadSuccess", {
+              file_name: selectedFile.name,
+              bucket: uploadResult.bucketName,
+              funnel: "ai_website_workshop"
+            });
+          }
           showStatus("success", "Payment proof uploaded, confirmation email sent, registration saved, and invoice downloaded successfully. Redirecting now...");
           window.setTimeout(() => {
             window.location.href = "thank-you.html";

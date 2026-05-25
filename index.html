@@ -28,6 +28,23 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <script>
+    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+    n.push=n;n.loaded=!0;n.version="2.0";n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window, document,"script",
+    "https://connect.facebook.net/en_US/fbevents.js");
+    fbq("init", "1471930020871566");
+    fbq("track", "PageView");
+    window.pixlupMetaTrack = function(method, eventName, params) {
+      if (typeof window.fbq !== "function") return;
+      try {
+        window.fbq(method, eventName, params || {});
+      } catch (error) {
+        console.warn("Meta Pixel tracking error:", error);
+      }
+    };
+  </script>
+  <script>
     window.pixlupTailwindConfig = {
       theme: {
         extend: {
@@ -703,6 +720,9 @@
   </style>
 </head>
 <body>
+  <noscript>
+    <img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1471930020871566&ev=PageView&noscript=1" alt="" />
+  </noscript>
   <div id="root"></div>
 
   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
@@ -1513,7 +1533,14 @@
         if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
       };
 
-      const openWorkshopForm = () => {
+      const openWorkshopForm = (source = "homepage_workshop") => {
+        if (window.pixlupMetaTrack) {
+          window.pixlupMetaTrack("trackCustom", "RegistrationButtonClick", {
+            source,
+            destination: "register.html",
+            funnel: "ai_website_workshop"
+          });
+        }
         window.location.href = workshopRegistrationUrl;
       };
 
@@ -1574,7 +1601,7 @@
                 <div className="mt-6 flex flex-col gap-3 sm:flex-row">
                   <MagneticButton
                     as="button"
-                    onClick={openWorkshopForm}
+                    onClick={() => openWorkshopForm("workshop_hero_primary")}
                     light
                     className="webinar-primary-cta w-full px-8 py-4 text-base text-white sm:w-auto sm:min-w-[220px] sm:px-10 sm:py-5"
                   >
@@ -1663,7 +1690,7 @@
                     </div>
                     <button
                       type="button"
-                      onClick={openWorkshopForm}
+                      onClick={() => openWorkshopForm("workshop_details_card")}
                       className="webinar-primary-cta mt-6 inline-flex w-full items-center justify-center rounded-full px-8 py-4 text-base font-extrabold text-white"
                     >
                       Register Now
@@ -1677,7 +1704,7 @@
           <div className="mobile-sticky-cta fixed inset-x-4 bottom-4 z-40 hidden items-center rounded-full border border-white/12 bg-[#0A0D12]/88 p-2 shadow-card backdrop-blur-2xl">
             <button
               type="button"
-              onClick={openWorkshopForm}
+              onClick={() => openWorkshopForm("workshop_mobile_sticky")}
               className="webinar-primary-cta inline-flex w-full items-center justify-center rounded-full px-6 py-4 text-base font-extrabold text-white"
             >
               Reserve Your Seat
@@ -2845,4 +2872,3 @@
   </script>
 </body>
 </html>
-
