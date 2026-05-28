@@ -21,11 +21,35 @@
         history.replaceState(null, "", window.location.pathname + window.location.search);
       }
 
+      var keepAtTop = true;
+      var stopTopGuard = function () {
+        keepAtTop = false;
+      };
+
+      ["wheel", "touchstart", "pointerdown", "keydown"].forEach(function (eventName) {
+        window.addEventListener(eventName, stopTopGuard, { passive: true, once: true });
+      });
+
+      var holdLandingAtTop = function () {
+        if (keepAtTop) {
+          window.scrollTo(0, 0);
+        }
+      };
+
+      holdLandingAtTop();
+      var topGuard = window.setInterval(holdLandingAtTop, 120);
+      window.setTimeout(function () {
+        window.clearInterval(topGuard);
+      }, 4200);
+
       window.addEventListener("load", function () {
-        window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+        holdLandingAtTop();
         window.setTimeout(function () {
-          window.scrollTo({ top: 0, left: 0, behavior: "auto" });
-        }, 80);
+          holdLandingAtTop();
+        }, 1200);
+        window.setTimeout(function () {
+          holdLandingAtTop();
+        }, 2600);
       });
     })();
   </script>
