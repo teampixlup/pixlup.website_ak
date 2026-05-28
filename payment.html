@@ -1196,10 +1196,17 @@
           const uploadResult = await uploadToSupabase(clients, selectedFile);
 
           setProgress(96, "Sending confirmation");
-          await sendConfirmationEmail();
-
-          setProgress(98, "Saving registration");
-          await submitRegistrationToWeb3Forms(uploadResult);
+          const [emailResult, web3Result] = await Promise.allSettled([
+            sendConfirmationEmail(),
+            submitRegistrationToWeb3Forms(uploadResult)
+          ]);
+          if (emailResult.status === "rejected") {
+            console.warn("EmailJS notification failed (non-fatal):", emailResult.reason);
+          }
+          if (web3Result.status === "rejected") {
+            throw new Error("Registration could not be saved: " + (web3Result.reason && web3Result.reason.message ? web3Result.reason.message : "Please try again."));
+          }
+          setProgress(98, "Registration saved");
 
           setProgress(99, "Generating invoice");
           generateProfessionalInvoicePdf(uploadResult);

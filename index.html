@@ -26,13 +26,15 @@
         keepAtTop = false;
       };
 
+      window.pixlupStopTopGuard = stopTopGuard;
+
       ["wheel", "touchstart", "pointerdown", "keydown"].forEach(function (eventName) {
         window.addEventListener(eventName, stopTopGuard, { passive: true, once: true });
       });
 
       var holdLandingAtTop = function () {
         if (keepAtTop) {
-          window.scrollTo(0, 0);
+          window.scrollTo({ top: 0, left: 0, behavior: "instant" });
         }
       };
 
@@ -1570,20 +1572,44 @@
     function WorkshopHero() {
       const reduced = useReducedMotionSafe();
 
-      const scrollToRegistration = () => {
-        const target = document.getElementById("workshop-registration");
-        if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
-      };
+      const [regName, setRegName] = useState("");
+      const [regEmail, setRegEmail] = useState("");
+      const [regPhone, setRegPhone] = useState("");
+      const [regSubmitting, setRegSubmitting] = useState(false);
 
-      const openWorkshopForm = (source = "homepage_workshop") => {
+      const handleRegistrationSubmit = (event) => {
+        event.preventDefault();
+        setRegSubmitting(true);
         if (window.pixlupMetaTrack) {
           window.pixlupMetaTrack("trackCustom", "RegistrationButtonClick", {
-            source,
-            destination: "register.html",
+            source: "homepage_inline_form",
+            destination: "payment.html",
             funnel: "ai_website_workshop"
           });
+          window.pixlupMetaTrack("track", "InitiateCheckout", {
+            content_name: "PixlUp AI Website Workshop",
+            value: 149,
+            currency: "INR"
+          });
         }
-        window.location.href = workshopRegistrationUrl;
+        try {
+          sessionStorage.setItem("pixlupWorkshopRegistration", JSON.stringify({
+            name: regName.trim(),
+            email: regEmail.trim(),
+            phone: regPhone.trim(),
+            registeredAt: new Date().toISOString()
+          }));
+        } catch (e) {}
+        window.location.href = "payment.html";
+      };
+
+      const scrollToRegistration = () => {
+        if (window.pixlupStopTopGuard) window.pixlupStopTopGuard();
+        const target = document.getElementById("workshop-registration");
+        if (target) {
+          const top = target.getBoundingClientRect().top + window.scrollY - 80;
+          window.scrollTo({ top, behavior: "smooth" });
+        }
       };
 
       return (
@@ -1643,7 +1669,7 @@
                 <div className="mt-6 flex flex-col gap-3 sm:flex-row">
                   <MagneticButton
                     as="button"
-                    onClick={() => openWorkshopForm("workshop_hero_primary")}
+                    onClick={scrollToRegistration}
                     light
                     className="webinar-primary-cta w-full px-8 py-4 text-base text-white sm:w-auto sm:min-w-[220px] sm:px-10 sm:py-5"
                   >
@@ -1715,28 +1741,55 @@
                   </div>
 
                   <div className="rounded-[28px] border border-white/10 bg-white/[0.045] p-5 sm:p-6">
-                    <div className="text-[11px] font-extrabold uppercase tracking-[0.18em] text-white/42">Save your seat</div>
+                    <div className="text-[11px] font-extrabold uppercase tracking-[0.18em] text-white/42">Registration</div>
                     <h3 className="mt-4 text-2xl font-extrabold tracking-[-0.045em] text-white">
-                      Continue to registration and reserve your workshop seat.
+                      Reserve your workshop seat.
                     </h3>
                     <p className="mt-4 text-sm leading-7 text-white/56">
-                      Move to the dedicated registration page to submit your details, continue to payment verification, and complete your workshop booking smoothly.
+                      Fill in your details below and continue to payment to confirm your spot.
                     </p>
-                    <div className="mt-6 space-y-3">
-                      <div className="rounded-[20px] border border-white/10 bg-[#0C111A] px-4 py-3 text-sm font-semibold text-white/76">
-                        Premium guided registration flow
-                      </div>
-                      <div className="rounded-[20px] border border-white/10 bg-[#0C111A] px-4 py-3 text-sm font-semibold text-white/76">
-                        Mobile-friendly and fast to complete
-                      </div>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => openWorkshopForm("workshop_details_card")}
-                      className="webinar-primary-cta mt-6 inline-flex w-full items-center justify-center rounded-full px-8 py-4 text-base font-extrabold text-white"
-                    >
-                      Register Now
-                    </button>
+                    <form onSubmit={handleRegistrationSubmit} className="mt-6 grid gap-4">
+                      <label>
+                        <span className="mb-2 block text-xs font-extrabold uppercase tracking-[0.16em] text-white/42">Full Name</span>
+                        <input
+                          className="form-field"
+                          type="text"
+                          placeholder="Your full name"
+                          required
+                          value={regName}
+                          onChange={(e) => setRegName(e.target.value)}
+                        />
+                      </label>
+                      <label>
+                        <span className="mb-2 block text-xs font-extrabold uppercase tracking-[0.16em] text-white/42">Email Address</span>
+                        <input
+                          className="form-field"
+                          type="email"
+                          placeholder="you@example.com"
+                          required
+                          value={regEmail}
+                          onChange={(e) => setRegEmail(e.target.value)}
+                        />
+                      </label>
+                      <label>
+                        <span className="mb-2 block text-xs font-extrabold uppercase tracking-[0.16em] text-white/42">WhatsApp Number</span>
+                        <input
+                          className="form-field"
+                          type="tel"
+                          placeholder="+91 98765 43210"
+                          required
+                          value={regPhone}
+                          onChange={(e) => setRegPhone(e.target.value)}
+                        />
+                      </label>
+                      <button
+                        type="submit"
+                        disabled={regSubmitting}
+                        className="webinar-primary-cta mt-2 inline-flex w-full items-center justify-center rounded-full px-8 py-4 text-base font-extrabold text-white disabled:cursor-not-allowed disabled:opacity-80"
+                      >
+                        {regSubmitting ? "Continuing..." : "Continue To Payment"}
+                      </button>
+                    </form>
                   </div>
                 </div>
               </div>
@@ -1746,7 +1799,7 @@
           <div className="mobile-sticky-cta fixed inset-x-4 bottom-4 z-40 hidden items-center rounded-full border border-white/12 bg-[#0A0D12]/88 p-2 shadow-card backdrop-blur-2xl">
             <button
               type="button"
-              onClick={() => openWorkshopForm("workshop_mobile_sticky")}
+              onClick={scrollToRegistration}
               className="webinar-primary-cta inline-flex w-full items-center justify-center rounded-full px-6 py-4 text-base font-extrabold text-white"
             >
               Reserve Your Seat
