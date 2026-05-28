@@ -11,6 +11,24 @@
   <meta name="creator" content="PixlUP" />
   <meta name="application-name" content="PixlUP" />
   <meta name="theme-color" content="#050608" />
+  <script>
+    (function () {
+      if ("scrollRestoration" in history) {
+        history.scrollRestoration = "manual";
+      }
+
+      if (window.location.hash) {
+        history.replaceState(null, "", window.location.pathname + window.location.search);
+      }
+
+      window.addEventListener("load", function () {
+        window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+        window.setTimeout(function () {
+          window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+        }, 80);
+      });
+    })();
+  </script>
   <meta property="og:title" content="PixlUP | Next-Generation Digital Growth Agency" />
   <meta property="og:description" content="Websites, branding, marketing, social media, content, SEO, ads, and growth systems for modern businesses." />
   <meta property="og:type" content="website" />
